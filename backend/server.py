@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import asyncio
@@ -146,6 +146,17 @@ async def get_price(symbol: str):
         return {"price": 0.0, "error": str(e)}
     
     return {"price": 0.0}
+
+@app.api_route("/{path_name:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"])
+async def catch_all(request: Request, path_name: str):
+    return {
+        "debug": True,
+        "message": "Catch-all route hit",
+        "path": path_name,
+        "method": request.method,
+        "base_url": str(request.base_url),
+        "url": str(request.url)
+    }
 
 if __name__ == "__main__":
     import uvicorn
