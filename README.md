@@ -3,10 +3,7 @@
 Verify-Mind AI is a cutting-edge decentralized application (dApp) that leverages **Trusted Execution Environments (TEEs)** and the **Flare Network** to enable verifiable, secure, and autonomous AI trading strategies.
 
 ## FLARE TECHNOLOGY USED
-Flare Data Connector
-Flare Time Series Oracle
-Flare AI Kit
-Flare Smart Accounts
+Flare Data Connector, Flare Time Series Oracle, Flare AI Kit, Flare Smart Accounts
 
 ## 🚀 Overview
 
