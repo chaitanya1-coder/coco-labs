@@ -104,7 +104,7 @@ function App() {
 
       } catch (error) {
         console.error("Error executing strategy:", error);
-        addMessage("Error executing strategy. Check console.", true);
+        addMessage(`Error: ${error.message}`, true);
       }
 
     } else {
