@@ -26,10 +26,12 @@ class StrategyResponse(BaseModel):
     signature: str
     price: float
 
+@app.get("/health")
 @app.get("/api/health")
 async def health_check():
     return {"status": "ok"}
 
+@app.post("/execute-strategy")
 @app.post("/api/execute-strategy")
 async def execute_strategy():
     """
@@ -102,6 +104,7 @@ async def execute_strategy():
         traceback.print_exc()
         return {"error": str(e), "message": "Internal Server Error during strategy execution"}
 
+@app.get("/price/{symbol}")
 @app.get("/api/price/{symbol}")
 async def get_price(symbol: str):
     """
