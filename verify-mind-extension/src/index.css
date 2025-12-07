@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    @apply bg-[#111111] text-white;
+    width: 400px;
+    height: 600px;
+    overflow: hidden;
+}

@@ -1,0 +1,17 @@
+{
+  "../../../../../@crx/manifest": {
+    "file": "assets/crx-manifest.js-CT7PYf3O.js",
+    "name": "crx-manifest.js",
+    "src": "../../../../../@crx/manifest",
+    "isEntry": true
+  },
+  "index.html": {
+    "file": "assets/index.html-Cxs66acP.js",
+    "name": "index.html",
+    "src": "index.html",
+    "isEntry": true,
+    "css": [
+      "assets/index-CJLqFXWv.css"
+    ]
+  }
+}
