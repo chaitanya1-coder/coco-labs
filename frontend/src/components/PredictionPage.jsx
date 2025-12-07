@@ -58,7 +58,7 @@ const CoinSection = ({ coin }) => {
     useEffect(() => {
         const fetchPrice = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/price/${coin.symbol}`);
+                const response = await fetch(`/api/price/${coin.symbol}`);
                 const result = await response.json();
 
                 if (result.price > 0) {

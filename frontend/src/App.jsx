@@ -29,7 +29,7 @@ function App() {
 
       // Call Backend API
       try {
-        const response = await fetch('http://localhost:8000/execute-strategy', {
+        const response = await fetch('/api/execute-strategy', {
           method: 'POST'
         });
         const data = await response.json();

@@ -6,12 +6,12 @@ import sys
 import os
 
 # Add flare-ai-kit to python path
-sys.path.append(os.path.abspath("../flare-ai-kit/src"))
+# sys.path.append(os.path.abspath("../flare-ai-kit/src"))
 
 from flare_ai_kit import FlareAIKit
 from flare_ai_kit.tee.attestation import VtpmAttestation
 
-app = FastAPI()
+app = FastAPI(root_path="/api")
 
 # Enable CORS for frontend
 app.add_middleware(
