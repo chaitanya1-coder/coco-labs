@@ -8,7 +8,6 @@ import os
 # Add current directory to sys.path for Vercel
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from flare_ai_kit import FlareAIKit
 from flare_ai_kit.tee.attestation import VtpmAttestation
 
 app = FastAPI()
