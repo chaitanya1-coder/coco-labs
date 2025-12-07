@@ -32,7 +32,18 @@ function App() {
         const response = await fetch('/api/execute-strategy', {
           method: 'POST'
         });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("Backend Error Response:", errorText);
+          throw new Error(`Server Error ${response.status}: ${errorText}`);
+        }
+
         const data = await response.json();
+
+        if (data.error) {
+          throw new Error(data.message || data.error);
+        }
 
         // On-Chain Verification
         if (window.ethereum) {

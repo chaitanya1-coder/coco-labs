@@ -5,8 +5,8 @@ import asyncio
 import sys
 import os
 
-# Add flare-ai-kit to python path
-# sys.path.append(os.path.abspath("../flare-ai-kit/src"))
+# Add current directory to sys.path for Vercel
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from flare_ai_kit import FlareAIKit
 from flare_ai_kit.tee.attestation import VtpmAttestation
@@ -32,67 +32,72 @@ async def execute_strategy():
     """
     Simulates the TEE strategy execution using real FDC prices.
     """
-    print("Executing strategy...")
-    
-    # Initialize TEE Attestation (Simulated)
-    attestation = VtpmAttestation(simulate=True)
-    
-    # Fetch Real BTC and FLR Prices from FDC
-    import httpx
-    
-    BTC_FEED_ID = "0x014254432f55534400000000000000000000000000" # BTC/USD
-    FLR_FEED_ID = "0x01464c522f55534400000000000000000000000000" # FLR/USD
-    
-    price_btc = 0.0
-    price_flr = 0.0
-    sparkdex_rate = 0.0
-    
     try:
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                "https://flr-data-availability.flare.network/api/v0/ftso/anchor-feeds-with-proof",
-                json={"feed_ids": [BTC_FEED_ID, FLR_FEED_ID]}
-            )
-            data = response.json()
-            
-            # Helper to parse price
-            def get_price(feed_id, data):
-                for item in data:
-                    if item["body"]["id"] == feed_id:
-                        return float(item["body"]["value"]) * (10 ** -item["body"]["decimals"])
-                return 0.0
+        print("Executing strategy...")
+        
+        # Initialize TEE Attestation (Simulated)
+        attestation = VtpmAttestation(simulate=True)
+        
+        # Fetch Real BTC and FLR Prices from FDC
+        import httpx
+        
+        BTC_FEED_ID = "0x014254432f55534400000000000000000000000000" # BTC/USD
+        FLR_FEED_ID = "0x01464c522f55534400000000000000000000000000" # FLR/USD
+        
+        price_btc = 0.0
+        price_flr = 0.0
+        sparkdex_rate = 0.0
+        
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    "https://flr-data-availability.flare.network/api/v0/ftso/anchor-feeds-with-proof",
+                    json={"feed_ids": [BTC_FEED_ID, FLR_FEED_ID]}
+                )
+                data = response.json()
+                
+                # Helper to parse price
+                def get_price(feed_id, data):
+                    for item in data:
+                        if item["body"]["id"] == feed_id:
+                            return float(item["body"]["value"]) * (10 ** -item["body"]["decimals"])
+                    return 0.0
 
-            price_btc = get_price(BTC_FEED_ID, data)
-            price_flr = get_price(FLR_FEED_ID, data)
-            
-            print(f"Fetched Prices from FDC - BTC: ${price_btc}, FLR: ${price_flr}")
-            
-            if price_btc > 0:
-                sparkdex_rate = price_flr / price_btc # Implied FLR/BTC rate
-            else:
-                sparkdex_rate = 0.0000105 # Fallback
-            
+                price_btc = get_price(BTC_FEED_ID, data)
+                price_flr = get_price(FLR_FEED_ID, data)
+                
+                print(f"Fetched Prices from FDC - BTC: ${price_btc}, FLR: ${price_flr}")
+                
+                if price_btc > 0:
+                    sparkdex_rate = price_flr / price_btc # Implied FLR/BTC rate
+                else:
+                    sparkdex_rate = 0.0000105 # Fallback
+                
+        except Exception as e:
+            print(f"Error fetching FDC prices: {e}")
+            price_btc = 94999.00
+            sparkdex_rate = 0.0000105
+        
+        # Use the calculated FDC rate for the trade
+        amount_out = 1 * sparkdex_rate
+        
+        instruction = f"BUY 1 C2FLR worth of WBTC at rate {sparkdex_rate:.8f} (Output: {amount_out:.8f} WBTC)"
+        print(f"Generating attestation for: {instruction}")
+        
+        # Generate attestation quote with the instruction as a nonce
+        quote = attestation.get_token(nonces=[instruction])
+        
+        # The quote serves as the "Proof of Inference" (signature)
+        return {
+            "message": f"Trigger Detected BUYING 1 C2FLR worth of WBTC (Rate: {sparkdex_rate:.8f} via FDC)",
+            "signature": quote,
+            "instruction": instruction,
+            "price": price_btc
+        }
     except Exception as e:
-        print(f"Error fetching FDC prices: {e}")
-        price_btc = 94999.00
-        sparkdex_rate = 0.0000105
-    
-    # Use the calculated FDC rate for the trade
-    amount_out = 1 * sparkdex_rate
-    
-    instruction = f"BUY 1 C2FLR worth of WBTC at rate {sparkdex_rate:.8f} (Output: {amount_out:.8f} WBTC)"
-    print(f"Generating attestation for: {instruction}")
-    
-    # Generate attestation quote with the instruction as a nonce
-    quote = attestation.get_token(nonces=[instruction])
-    
-    # The quote serves as the "Proof of Inference" (signature)
-    return {
-        "message": f"Trigger Detected BUYING 1 C2FLR worth of WBTC (Rate: {sparkdex_rate:.8f} via FDC)",
-        "signature": quote,
-        "instruction": instruction,
-        "price": price_btc
-    }
+        import traceback
+        traceback.print_exc()
+        return {"error": str(e), "message": "Internal Server Error during strategy execution"}
 
 @app.get("/price/{symbol}")
 async def get_price(symbol: str):
