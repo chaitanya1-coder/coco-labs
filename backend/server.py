@@ -11,7 +11,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from flare_ai_kit import FlareAIKit
 from flare_ai_kit.tee.attestation import VtpmAttestation
 
-app = FastAPI(root_path="/api")
+app = FastAPI()
 
 # Enable CORS for frontend
 app.add_middleware(
@@ -27,7 +27,11 @@ class StrategyResponse(BaseModel):
     signature: str
     price: float
 
-@app.post("/execute-strategy")
+@app.get("/api/health")
+async def health_check():
+    return {"status": "ok"}
+
+@app.post("/api/execute-strategy")
 async def execute_strategy():
     """
     Simulates the TEE strategy execution using real FDC prices.
@@ -99,7 +103,7 @@ async def execute_strategy():
         traceback.print_exc()
         return {"error": str(e), "message": "Internal Server Error during strategy execution"}
 
-@app.get("/price/{symbol}")
+@app.get("/api/price/{symbol}")
 async def get_price(symbol: str):
     """
     Returns the latest price for a given symbol (btc, eth, bnb) from FDC.
