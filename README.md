@@ -2,6 +2,12 @@
 
 Verify-Mind AI is a cutting-edge decentralized application (dApp) that leverages **Trusted Execution Environments (TEEs)** and the **Flare Network** to enable verifiable, secure, and autonomous AI trading strategies.
 
+## FLARE TECHNOLOGY USED
+Flare Data Connector
+Flare Time Series Oracle
+Flare AI Kit
+Flare Smart Accounts
+
 ## 🚀 Overview
 
 The project integrates a secure smart contract vault with an AI agent running in a simulated TEE. Users can deposit funds into the vault, which authorizes the AI agent to execute trades based on pre-defined, verifiable strategies. The system ensures that trades are only executed if the AI model and data sources are attested and authentic.
